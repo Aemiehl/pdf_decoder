@@ -53,9 +53,9 @@ int get_block_type(const std::vector<uint8_t>& data, size_t& bit_pos) {
     return btype;
 }
 
-#include "HuffmanPage.cpp"
+// #include "HuffmanPage.cpp"
 int main() {
-    std::ifstream file("test2.png", std::ios::binary);
+    std::ifstream file("./data/test2.png", std::ios::binary);
     std::vector<uint8_t> compressed_data;
     
     if (!file.is_open()) {
