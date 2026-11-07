@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <cstddef>  
 
-void process_dynamic_huffman_block(const std::vector<uint8_t>& data, size_t& bit_pos, std::vector<uint8_t>& decoded_data);
+uint32_t decode_symbol(const std::vector<uint8_t>& data, std::map<uint32_t, uint32_t> table, size_t& bit_pos);
+std::map<uint32_t, uint32_t> build_huffman_table(const std::vector<uint8_t>& lengths, size_t size);
 
 #endif

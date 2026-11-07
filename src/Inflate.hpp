@@ -2,6 +2,9 @@
 #define INFLATE_HPP
 
 #include <vector>
+#include <cstdint>
+#include <cstddef>  
  
+int zlib_decompress(std::vector<uint8_t> compressed_data);
 
 #endif

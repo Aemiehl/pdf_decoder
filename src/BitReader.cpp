@@ -2,7 +2,8 @@
 
 #include <vector>
 #include <cstdint>
-#include <cstddef>  
+#include <cstddef> 
+#include <stdexcept> 
 
 //einlesen von bis zu 32 bits | scheint RICHTIG
 uint32_t readBits(const std::vector<uint8_t>& data, size_t& startBit, size_t numBits) {

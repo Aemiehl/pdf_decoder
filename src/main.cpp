@@ -4,8 +4,7 @@
 #include <cstdint>
 #include <cstring>
 
-#include "Huffman.hpp"
-#include "LZ77.hpp"
+#include "Inflate.hpp"
 
 // Funktion, um 4-Byte-Wert von Big-Endian nach Little-Endian zu konvertieren
 uint32_t to_little_endian(uint8_t* bytes) {
@@ -17,41 +16,6 @@ bool check_png_header(uint8_t* header) {
     // PNG-Dateien haben immer diese spezielle Signatur als Header
     uint8_t png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
     return std::memcmp(header, png_signature, 8) == 0;
-}
-
-// Funktion zum Lesen der ersten Bits des DEFLATE-Streams, um den Blocktyp zu bestimmen
-int get_block_type(const std::vector<uint8_t>& data, size_t& bit_pos) {
-    size_t byte_pos = bit_pos / 8;  // Berechne das aktuelle Byte
-    size_t bit_offset = bit_pos % 8;  // Berechne die Bit-Position innerhalb des Bytes
-
-    uint8_t first_byte = data[byte_pos];  // Hol das aktuelle Byte
-    // BFINAL ist das erste Bit
-    int bfinal = (first_byte >> bit_offset) & 1;
-
-    // BTYPE sind die nächsten 2 Bits
-    int btype = (first_byte >> (bit_offset + 1)) & 3;
-
-    // Wenn das Bit-Offset nicht bei 0 liegt, müssen wir die Bits aus dem nächsten Byte holen
-    if(bit_offset <= 5) {
-        // Der normale Fall: BTYPE passt vollständig in das aktuelle Byte
-        btype = (first_byte >> (bit_offset + 1)) & 3;
-    
-    }else if(bit_offset == 6) {
-        // Spezialfall: BFINAL im aktuellen Byte, 1 Bit von BTYPE im aktuellen und 1 Bit im nächsten Byte
-        uint8_t next_byte = data[byte_pos + 1];
-        btype = ((first_byte >> 7) & 1) | ((next_byte & 1) << 1);
-    
-    }else if(bit_offset == 7) {
-        // Spezialfall: BFINAL im aktuellen Byte, beide BTYPE-Bits im nächsten Byte
-        uint8_t next_byte = data[byte_pos + 1];
-        btype = next_byte & 3;  // Die ersten beiden Bits des nächsten Bytes
-    }
-
-    // Update der Bit-Position um 3
-    bit_pos += 3;
-
-    std::cout << "BFINAL: " << bfinal << ", BTYPE: " << btype << std::endl;
-    return btype;
 }
 
 int main() {
@@ -112,6 +76,10 @@ int main() {
 
         // PLTE-Chunk behandeln (weis noch nicht ob nötig)
         if (chunk_type == "PLTE"){
+            std::vector<uint8_t> palette;
+            palette.resize(length);
+            file.read(reinterpret_cast<char*>(palette.data()), length);
+            file.seekg(4, std::ios::cur); 
             continue;
         }
 
@@ -157,7 +125,7 @@ int main() {
     bit_pos = 0;
     
     //decoded_data = sh_zlib_decompress(compressed_data);
-    process_dynamic_huffman_block(compressed_data, bit_pos, decoded_data);
+    // process_dynamic_huffman_block(compressed_data, bit_pos, decoded_data);
 
 
 
