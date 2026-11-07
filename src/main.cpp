@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include "Huffman.hpp"
+#include "LZ77.hpp"
 
 // Funktion, um 4-Byte-Wert von Big-Endian nach Little-Endian zu konvertieren
 uint32_t to_little_endian(uint8_t* bytes) {
@@ -74,6 +75,7 @@ int main() {
 
     
     // Jetzt beginnen die Chunks (erstes Chunk sollte IHDR sein)
+    // hier werden die einzelnen chunks ausgelesen und zugeordnet
     while (!file.eof()) {
         uint8_t length_bytes[4];
         uint8_t type_bytes[4];
@@ -108,6 +110,11 @@ int main() {
             continue;
         }
 
+        // PLTE-Chunk behandeln (weis noch nicht ob nötig)
+        if (chunk_type == "PLTE"){
+            continue;
+        }
+
         // IDAT-Chunk behandeln (enthält das Bild)  
         if (chunk_type == "IDAT") {
             std::vector<uint8_t> idat_data(length);
@@ -128,6 +135,7 @@ int main() {
     }
     
     // IDAT-Chunk compressed_data behandeln (enthält das Bild)  
+
     size_t bit_pos = 16;  // Starte bei der ersten Bit-Position, 16 um den zlib header zu überspringen
     int blockType = get_block_type(compressed_data, bit_pos);
     if(blockType != 2){
