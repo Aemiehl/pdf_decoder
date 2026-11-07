@@ -2,6 +2,7 @@
 #define HUFFMAN_HPP
 
 #include <vector>
+#include <map>
 #include <cstdint>
 #include <cstddef>  
 

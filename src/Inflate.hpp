@@ -5,6 +5,6 @@
 #include <cstdint>
 #include <cstddef>  
  
-int zlib_decompress(std::vector<uint8_t> compressed_data);
+std::vector<uint8_t> zlib_decompress(const std::vector<uint8_t> compressed_data);
 
 #endif

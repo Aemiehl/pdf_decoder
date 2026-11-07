@@ -103,15 +103,8 @@ int main() {
     }
     
     // IDAT-Chunk compressed_data behandeln (enthält das Bild)  
+    std::vector<uint8_t> data = zlib_decompress(compressed_data);
 
-    size_t bit_pos = 16;  // Starte bei der ersten Bit-Position, 16 um den zlib header zu überspringen
-    int blockType = get_block_type(compressed_data, bit_pos);
-    if(blockType != 2){
-        std::cerr << "No implementation for such Block Types! " << blockType << std::endl;
-        return -1;
-    }else{
-        std::cout << "Block Type is 2!" << std::endl;
-    }
 
 
 
@@ -122,7 +115,7 @@ int main() {
     //bit_pos = 16;
 
     std::vector<uint8_t> decoded_data;
-    bit_pos = 0;
+    // bit_pos = 0;
     
     //decoded_data = sh_zlib_decompress(compressed_data);
     // process_dynamic_huffman_block(compressed_data, bit_pos, decoded_data);

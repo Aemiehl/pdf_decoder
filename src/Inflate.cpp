@@ -7,6 +7,8 @@
 #include <vector>
 #include <map>
 #include <cstdint>
+#include <stdexcept>
+
 
 static void align_to_byte_boundary(size_t& bit_pos) {
     if (bit_pos % 8 != 0) {
@@ -138,13 +140,15 @@ static void process_dynamic_huffman_block(const std::vector<uint8_t>& data, size
     align_to_byte_boundary(bit_pos);
 }
 
-int zlib_decompress(std::vector<uint8_t> compressed_data){
-    size_t bit_pos = 16;  // Starte bei der ersten Bit-Position, 16 um den zlib header zu überspringen
+std::vector<uint8_t> zlib_decompress(const std::vector<uint8_t>& compressed_data){
+    std::vector<uint8_t> decoded_data;
+    size_t bit_pos = 16;                          // zlib-Header (2 Byte) überspringen
+
     int blockType = get_block_type(compressed_data, bit_pos);
-    if(blockType != 2){
-        std::cerr << "No implementation for such Block Types! " << blockType << std::endl;
-        return -1;
-    }else{
-        std::cout << "Block Type is 2!" << std::endl;
+    if (blockType != 2) {
+        throw std::runtime_error("Only Blocktyp 2 is implemented");
     }
+
+    process_dynamic_huffman_block(compressed_data, bit_pos, decoded_data);
+    return decoded_data;
 }
