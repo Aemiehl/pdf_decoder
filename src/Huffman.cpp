@@ -1,6 +1,8 @@
+#include "Huffman.hpp"
+
 #include <vector>
-#include <iostream>
 #include <map>
+#include <iostream>
 #include <stdexcept>
 #include <cstdint>
 
@@ -12,7 +14,7 @@ void align_to_byte_boundary(size_t& bit_pos) {
 }
 
 //einlesen von bis zu 32 bits | scheint RICHTIG
-uint32_t readBits(const std::vector<uint8_t>& data, size_t& startBit, size_t numBits) {
+static uint32_t readBits(const std::vector<uint8_t>& data, size_t& startBit, size_t numBits) {
     uint32_t result = 0;  // Hier speichern wir das Ergebnis
     size_t byteIndex = startBit / 8;  // Der Startbyte-Index
     size_t bitIndex = startBit % 8;   // Der Startbit-Index innerhalb des Bytes
@@ -42,7 +44,7 @@ uint32_t readBits(const std::vector<uint8_t>& data, size_t& startBit, size_t num
 }
 
 
-uint32_t decode_symbol(const std::vector<uint8_t>& data, std::map<uint32_t, uint32_t> table, size_t& bit_pos){
+static uint32_t decode_symbol(const std::vector<uint8_t>& data, std::map<uint32_t, uint32_t> table, size_t& bit_pos){
     uint32_t symbol = 0;
     int symbolSize = 0;
 
@@ -62,7 +64,7 @@ uint32_t decode_symbol(const std::vector<uint8_t>& data, std::map<uint32_t, uint
     }
 }
 
-void readH(const std::vector<uint8_t>& data, std::map<uint32_t, uint32_t> table, std::vector<uint8_t>& codes, size_t& bit_pos, size_t H) {
+static void readH(const std::vector<uint8_t>& data, std::map<uint32_t, uint32_t> table, std::vector<uint8_t>& codes, size_t& bit_pos, size_t H) {
    
     size_t i = 0;
 
@@ -98,21 +100,21 @@ void readH(const std::vector<uint8_t>& data, std::map<uint32_t, uint32_t> table,
 }
 
 // bauen der Huffman Table | scheint RICHTIG
-std::map<uint32_t, uint32_t> build_huffman_table(const std::vector<uint8_t>& lengths, size_t size) {
+static std::map<uint32_t, uint32_t> build_huffman_table(const std::vector<uint8_t>& lengths, size_t size) {
     
     std::map<uint32_t, uint32_t> table;
 
     std::vector<uint32_t> countVector(16, 0);
-    for(int i = 0; i < size; i++){
+    for(size_t i = 0; i < size; i++){
         countVector[lengths[i]] += 1;
     }
 
     std::vector<uint32_t> codeVector(16, 0);
-    for(int i = 1; i < 16; i++){
+    for(size_t i = 1; i < 16; i++){
         codeVector[i] = (codeVector[i-1] + countVector[i-1]) << 1;
     }
 
-    for (int i = 0; i < size; ++i) {
+    for (size_t i = 0; i < size; ++i) {
         uint8_t len = lengths[i];
         if (len != 0) {
             table[codeVector[len]] = i;
@@ -123,7 +125,7 @@ std::map<uint32_t, uint32_t> build_huffman_table(const std::vector<uint8_t>& len
     return table;
 }
 
-size_t decode_length(const std::vector<uint8_t>& data, size_t& bit_pos, uint32_t length){
+static size_t decode_length(const std::vector<uint8_t>& data, size_t& bit_pos, uint32_t length){
     if(length > 256 && length < 265){
         return length - 254;
 
@@ -141,7 +143,7 @@ size_t decode_length(const std::vector<uint8_t>& data, size_t& bit_pos, uint32_t
     return -1;
 }
 
-size_t decode_distance(const std::vector<uint8_t>& data, size_t& bit_pos, uint32_t distance){
+static size_t decode_distance(const std::vector<uint8_t>& data, size_t& bit_pos, uint32_t distance){
     if(distance < 4){
         return distance + 1;
 
@@ -156,7 +158,7 @@ size_t decode_distance(const std::vector<uint8_t>& data, size_t& bit_pos, uint32
     return -1;
 }
 
-void copy_sequence(std::vector<uint8_t>& decoded_data, size_t length, size_t distance) {
+static void copy_sequence(std::vector<uint8_t>& decoded_data, size_t length, size_t distance) {
     size_t start_pos = decoded_data.size() - distance;  // Bestimme, wo die zu kopierende Sequenz beginnt
     for (size_t i = 0; i < length; ++i) {
         decoded_data.push_back(decoded_data[start_pos + i % distance]);
@@ -173,7 +175,7 @@ void process_dynamic_huffman_block(const std::vector<uint8_t>& data, size_t& bit
     std::vector<uint8_t> code_length_order = {16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15};
     std::vector<uint8_t> code_lengths(19, 0);
 
-    for(int i = 0; i < HCLEN; i++){
+    for(size_t i = 0; i < HCLEN; i++){
         code_lengths[code_length_order[i]] = readBits(data, bit_pos, 3);
     }
 

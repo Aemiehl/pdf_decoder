@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <cstring>
 
-#include "Huffman.cpp"
+#include "Huffman.hpp"
 
 // Funktion, um 4-Byte-Wert von Big-Endian nach Little-Endian zu konvertieren
 uint32_t to_little_endian(uint8_t* bytes) {
@@ -53,7 +53,6 @@ int get_block_type(const std::vector<uint8_t>& data, size_t& bit_pos) {
     return btype;
 }
 
-// #include "HuffmanPage.cpp"
 int main() {
     std::ifstream file("./data/test2.png", std::ios::binary);
     std::vector<uint8_t> compressed_data;

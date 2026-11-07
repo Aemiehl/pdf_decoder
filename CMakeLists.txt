@@ -10,7 +10,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
  
 # Nur main.cpp, weil Huffman.cpp per #include eingebunden wird
-add_executable(decoder src/main.cpp)
+add_executable(decoder src/main.cpp src/Huffman.cpp)
  
 # Pfad zum data-Ordner, damit das Programm von überall aus die Bilder findet
 target_compile_definitions(decoder PRIVATE DATA_DIR="${CMAKE_SOURCE_DIR}/data")
